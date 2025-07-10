@@ -1,25 +1,27 @@
-rm(list = ls())
-setwd("~/iCloud/ofce/2023-04-15-economie-europeenne-inflation/")
-source("../../code/R-markdown/init_eurostat.R")
 library(tidyverse)
 library(eurostat)
-library(countrycode)
-library(gt)
-library(gtExtras)
-load_data("eurostat/geo.RData")
-load_data("eurostat/prc_hicp_manr.RData")
-load_data("eurostat/prc_hicp_ctrb.RData")
+
+## Load Eurostat datasets ------
+
+datasets_eurostat <- c("prc_hicp_manr", "prc_hicp_ctrb")
+
+for (dataset in datasets_eurostat){
+  assign(dataset, 
+         get_eurostat(dataset, stringsAsFactors = F, cache = F) |>
+           rename(date = TIME_PERIOD)
+  )
+}
+
+## Graphique 1 -------
 
 graphique1_line <- prc_hicp_manr %>%
   filter(coicop %in% c("CP00"),
          geo == "EA") %>%
-  month_to_date %>%
   filter(date >= as.Date("2021-03-01"),
          date <= as.Date("2023-04-01")) %>%
   bind_rows(prc_hicp_ctrb %>%
               filter(coicop %in% c("SERV", "IGD_NNRG"),
                      geo == "EA") %>%
-              month_to_date %>%
               filter(date >= as.Date("2021-03-01"),
                      date <= as.Date("2023-04-01")) %>%
               group_by(date, unit, geo) %>%
@@ -35,7 +37,6 @@ graphique1 <- prc_hicp_ctrb %>%
   filter(coicop %in% c("FOOD", "NRG", "IGD_NNRG", "SERV"),
          geo == "EA") %>%
   select(-geo, -unit) %>%
-  month_to_date %>%
   filter(date >= as.Date("2021-03-01"),
          date <= as.Date("2023-04-01")) %>%
   select(date, coicop, values)
