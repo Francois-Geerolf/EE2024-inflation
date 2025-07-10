@@ -31,7 +31,8 @@ graphique3 <- nasq_10_nf_tr %>%
          sector == "S11") %>%
   select(geo, date, values, na_item) %>%
   spread(na_item, values) %>%
-  filter(date >= as.Date("2017-01-01")) %>%
+  filter(date >= as.Date("2017-01-01"),
+         date <= as.Date("2023-04-01")) %>%
   arrange(date) %>%
   transmute(date, geo, profit_share = B2A3G/B1G)
 
