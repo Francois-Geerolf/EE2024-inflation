@@ -1,23 +1,25 @@
-rm(list = ls())
-setwd("~/Dropbox/ofce/2023-04-15-economie-europeenne/")
-source("../../code/R-markdown/init_eurostat.R")
+
 library(tidyverse)
 library(eurostat)
-library(countrycode)
-library(gt)
-library(gtExtras)
-load_data("eurostat/geo.RData")
-load_data("eurostat/na_item.RData")
-load_data("eurostat/coicop.RData")
-load_data("eurostat/nasq_10_nf_tr.RData")
 
-load_data("eurostat/geo_fr.Rdata")
-geo_fr <- geo %>%
-  setNames(c("geo", "Geo_fr")) %>%
-  mutate(Geo_fr = ifelse(geo == "DE", "Allemagne", Geo_fr),
-         Geo_fr = ifelse(geo == "EA19", "Zone Euro", Geo_fr))
-load_data("eurostat/geo.Rdata")
-load_data("eurostat/na_item_fr.Rdata")
+## Load Eurostat datasets ------
+
+datasets_eurostat <- c("nasq_10_nf_tr")
+
+for (dataset in datasets_eurostat){
+  assign(dataset, 
+         get_eurostat(dataset, stringsAsFactors = F, cache = F) |>
+           rename(date = TIME_PERIOD)
+  )
+}
+
+geo_colors <- tribble(~ geo, ~ Geo, ~ color,
+                      "FR", "France", "#ED2939",
+                      "DE", "Allemagne", "#000000",
+                      "EA19", "Zone Euro", "#003399",
+                      "ES", "Espagne", "#FFC400",
+                      "IT", "Italie", "#009246")
+
 
 
 graphique3 <- nasq_10_nf_tr %>%
@@ -27,19 +29,11 @@ graphique3 <- nasq_10_nf_tr %>%
          unit == "CP_MNAC",
          s_adj == "SCA",
          sector == "S11") %>%
-  select(geo, time, values, na_item) %>%
+  select(geo, date, values, na_item) %>%
   spread(na_item, values) %>%
-  quarter_to_date %>%
   filter(date >= as.Date("2017-01-01")) %>%
   arrange(date) %>%
   transmute(date, geo, profit_share = B2A3G/B1G)
-
-geo_colors <- tribble(~ geo, ~ Geo, ~ color,
-                      "FR", "France", "#ED2939",
-                      "DE", "Allemagne", "#000000",
-                      "EA19", "Zone Euro", "#003399",
-                      "ES", "Espagne", "#FFC400",
-                      "IT", "Italie", "#009246")
 
 
 graphique3 %>%
@@ -58,6 +52,7 @@ theme(legend.title = element_blank(),
 
 write.csv(graphique3, "graphique3.csv")
 ggsave("graphique3.pdf", width = 7, height = 4, device = cairo_pdf)
+ggsave("graphique3.png", width = 7, height = 4)
 
 
 
