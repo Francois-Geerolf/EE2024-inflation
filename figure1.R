@@ -4,6 +4,10 @@ library(viridis)
 
 ## Load Eurostat datasets ------
 
+
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
+invisible(Sys.setenv(TZ = "America/Los_Angeles"))
+
 datasets_eurostat <- c("prc_hicp_manr", "prc_hicp_ctrb")
 
 for (dataset in datasets_eurostat){
@@ -42,8 +46,6 @@ figure1 <- prc_hicp_ctrb %>%
   filter(date >= as.Date("2021-03-01"),
          date <= as.Date("2023-04-01")) %>%
   select(date, coicop, values)
-
-Sys.setlocale("LC_TIME", "fr_CA.UTF-8")   # keep French locale for month names if needed
 
 figure1 %>%
   mutate(Coicop_factor = factor(coicop, levels = c("SERV", "IGD_NNRG", "FOOD", "NRG"),
