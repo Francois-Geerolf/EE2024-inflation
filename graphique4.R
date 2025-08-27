@@ -1,17 +1,12 @@
+
+
 rm(list = ls())
-setwd("~/Dropbox/ofce/2023-04-15-economie-europeenne/")
-source("../../code/R-markdown/init_eurostat.R")
 library(tidyverse)
 library(eurostat)
 library(countrycode)
 library(gt)
 library(gtExtras)
-load_data("fred/energy.RData")
-load_data("fred/energy_variables.RData")
-load_data("us/nber_recessions.RData")
-load_data("us/US_Fed_Chair.RData")
-load_data("us/US_presidents.RData")
-load_data("uk/uk_extract.RData")
+load("~/iCloud/website/data/fred/energy.RData")
 
 
 graphique4 <- energy %>%
@@ -37,6 +32,9 @@ graphique4 %>%
 
 write.csv(graphique4, "graphique4.csv")
 ggsave("graphique4.pdf", width = 7, height = 4, device = cairo_pdf)
- 
+
+
+ggsave("graphique4.png", width = 7, height = 4)
+
 
 

@@ -14,10 +14,9 @@ for (dataset in datasets_eurostat){
 }
 
 
+## Figure 1 -------
 
-## Graphique 1 -------
-
-graphique1_line <- prc_hicp_manr %>%
+figure1_line <- prc_hicp_manr %>%
   filter(coicop %in% c("CP00"),
          geo == "EA") %>%
   filter(date >= as.Date("2021-03-01"),
@@ -32,11 +31,11 @@ graphique1_line <- prc_hicp_manr %>%
               ungroup %>%
               mutate(coicop  = "TOT_X_NRG_FOOD")) %>%
   mutate(Line = factor(coicop, levels = c("CP00", "TOT_X_NRG_FOOD"),
-                          labels = c("Inflation (HICP)", "Inflation sans énergie et alimentation"))) %>%
+                       labels = c("Inflation (HICP)", "Inflation excluding energy and food"))) %>%
   select(date, Line, values)
 
 
-graphique1 <- prc_hicp_ctrb %>%
+figure1 <- prc_hicp_ctrb %>%
   filter(coicop %in% c("FOOD", "NRG", "IGD_NNRG", "SERV"),
          geo == "EA") %>%
   select(-geo, -unit) %>%
@@ -44,16 +43,16 @@ graphique1 <- prc_hicp_ctrb %>%
          date <= as.Date("2023-04-01")) %>%
   select(date, coicop, values)
 
-Sys.setlocale("LC_TIME", "fr_CA.UTF-8")
+Sys.setlocale("LC_TIME", "fr_CA.UTF-8")   # keep French locale for month names if needed
 
-graphique1 %>%
+figure1 %>%
   mutate(Coicop_factor = factor(coicop, levels = c("SERV", "IGD_NNRG", "FOOD", "NRG"),
-                                labels = c("Services", "Biens manufacturés",
-                                           "Alimentation", "Energie"))) %>%
+                                labels = c("Services", "Manufactured goods",
+                                           "Food", "Energy"))) %>%
   ggplot(., aes(x = date, y = values/100)) +
   geom_col(aes(fill = Coicop_factor), alpha = 1) +
-  geom_line(data = graphique1_line, aes(linetype = Line), size = 1.2) +
-  theme_minimal() + xlab("") + ylab("Contributions à l'inflation en zone Euro") +
+  geom_line(data = figure1_line, aes(linetype = Line), size = 1.2) +
+  theme_minimal() + xlab("") + ylab("Contributions to inflation in the Euro area") +
   # c("orange", "red", "blue", "darkgreen")
   scale_fill_manual(values = viridis(4)[1:4]) +
   scale_x_date(breaks = "2 months",
@@ -66,12 +65,10 @@ graphique1 %>%
         legend.key.size = unit(0.4, "cm"))
 
 
+write.csv(figure1, "figure1.csv")
+write.csv(figure1_line, "figure1_line.csv")
 
-write.csv(graphique1, "graphique1.csv")
-write.csv(graphique1_line, "graphique1_line.csv")
-
-ggsave("graphique1.pdf", width = 7, height = 4, device = cairo_pdf)
-ggsave("graphique1.png", width = 7, height = 4)
-
+ggsave("figure1.pdf", width = 7, height = 4, device = cairo_pdf)
+ggsave("figure1.png", width = 7, height = 4)
 
 
