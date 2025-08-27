@@ -81,9 +81,7 @@ figure2 %>%
 write.csv(figure2, "figure2.csv")
 
 ggsave("figure2.pdf", width = 7, height = 4, device = cairo_pdf)
-ggsave("graphs/figure2a.pdf", width = 7, height = 4, device = cairo_pdf)
-ggsave("graphs/figure2b.pdf", width = 6.5, height = 3.5, device = cairo_pdf)
-
+ggsave("figure2.png", width = 7, height = 4)
 
 
 
